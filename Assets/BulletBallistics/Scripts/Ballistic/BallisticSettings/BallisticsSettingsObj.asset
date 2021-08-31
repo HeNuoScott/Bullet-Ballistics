@@ -1,0 +1,233 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a62e587f7449cab40b090a14f806e567, type: 3}
+  m_Name: BallisticsSettingsObj
+  m_EditorClassIdentifier: 
+  useBulletdrop: 1
+  useBulletdrag: 1
+  useBallisticMaterials: 1
+  useSpreadMaterials: 1
+  WindDirection: {x: 0, y: 0, z: 0}
+  AirDensity: 1.14
+  MaterialData:
+  - Name: Stone
+    EnergylossPerUnit: 5000
+    RndSpread: 5
+    RndSpreadRic: 7
+    RicochetPropability:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.12499999
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0.65625
+        inSlope: 1.2574342
+        outSlope: 1.2574342
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    impactObject: {fileID: 114000012531327170, guid: 20d3ca362b0d41b488edd551ec0aa9a0, type: 3}
+  - Name: Metal
+    EnergylossPerUnit: 3000
+    RndSpread: 6
+    RndSpreadRic: 8
+    RicochetPropability:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.011089668
+        value: -0.0013567917
+        inSlope: 0.020448085
+        outSlope: 0.020448085
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.69718134
+        value: 0.031206239
+        inSlope: 0.047461633
+        outSlope: 0.2071365
+        tangentMode: 5
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1.0024244
+        value: 0.16824234
+        inSlope: 0.92254037
+        outSlope: 0.92254037
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    impactObject: {fileID: 114000012531327170, guid: d8c93f88e7597634cbd3cf56337b84cb, type: 3}
+  - Name: Wood
+    EnergylossPerUnit: 2000
+    RndSpread: 4
+    RndSpreadRic: 7
+    RicochetPropability:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.012271986
+        value: -0.07605338
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1.190929
+        value: 0.21481547
+        inSlope: 0.39283344
+        outSlope: 0.39283344
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    impactObject: {fileID: 114000012531327170, guid: 4d3758788903d3e40ad8db78f33e75bc, type: 3}
+  - Name: Target
+    EnergylossPerUnit: 3000
+    RndSpread: 0
+    RndSpreadRic: 0
+    RicochetPropability:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0.1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    impactObject: {fileID: 114000012531327170, guid: 35d64844559499740a973bbf4b92fda7, type: 3}
+  - Name: Glass
+    EnergylossPerUnit: 1500
+    RndSpread: 2
+    RndSpreadRic: 5
+    RicochetPropability:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.9984985
+        value: 0.0044270605
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    impactObject: {fileID: 114000012531327170, guid: 505a8a958516af64380736e36cf837a8, type: 3}
+  - Name: Dirt
+    EnergylossPerUnit: 2500
+    RndSpread: 1
+    RndSpreadRic: 2
+    RicochetPropability:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: -0.0015015015
+        value: 0.049739596
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.99814737
+        value: 0.41781247
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    impactObject: {fileID: 114000012531327170, guid: ddc1274d52ebce24581b6e21bc695cdb, type: 3}
+  - Name: Plastic
+    EnergylossPerUnit: 3200
+    RndSpread: 4
+    RndSpreadRic: 5
+    RicochetPropability:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.050520845
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.997834
+        value: 0.2498897
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    impactObject: {fileID: 114000012531327170, guid: 44f22a17d2347314aa9dddf18ac9d670, type: 3}
