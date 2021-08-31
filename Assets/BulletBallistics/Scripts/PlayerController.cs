@@ -58,7 +58,7 @@ public class PlayerController : LivingEntity {
             Cursor.lockState = CursorLockMode.Locked;
         }
 
-        if (basicWeaponHandle.currentWeapon != -1)
+        if (basicWeaponHandle.currentWeaponId != -1)
         {
             Recoil();
             Aim();
@@ -75,12 +75,12 @@ public class PlayerController : LivingEntity {
     /// </summary>
     void Aim()
     {
-        if (Weapons[basicWeaponHandle.currentWeapon].weapon.isAiming)
+        if (Weapons[basicWeaponHandle.currentWeaponId].weapon.isAiming)
         {
-            Vector3 scopePos = Weapons[basicWeaponHandle.currentWeapon].ScopePos.localPosition;
+            Vector3 scopePos = Weapons[basicWeaponHandle.currentWeaponId].ScopePos.localPosition;
             HandTrans.localPosition = new Vector3(-scopePos.x, -scopePos.y, -scopePos.z);
         }
-        WeaponCam.fieldOfView = Cam.fieldOfView = Mathf.Lerp(Cam.fieldOfView, startFov * (Weapons[basicWeaponHandle.currentWeapon].weapon.isAiming?0.4f:1f), Time.deltaTime * 15);
+        WeaponCam.fieldOfView = Cam.fieldOfView = Mathf.Lerp(Cam.fieldOfView, startFov * (Weapons[basicWeaponHandle.currentWeaponId].weapon.isAiming?0.4f:1f), Time.deltaTime * 15);
     }
 
     /// <summary>
@@ -88,7 +88,7 @@ public class PlayerController : LivingEntity {
     /// </summary>
     void Recoil()
     {
-        if (!Weapons[basicWeaponHandle.currentWeapon].weapon.isAiming)
+        if (!Weapons[basicWeaponHandle.currentWeaponId].weapon.isAiming)
         {
             HandTrans.localPosition = Vector3.Lerp(StartHandPos, StartHandPos + relhandMovement, t);
             HandTrans.localEulerAngles = Vector3.Lerp(StartHandEuler, StartHandEuler + relHandRotEuler, t);
@@ -132,12 +132,12 @@ public class PlayerController : LivingEntity {
         controller.Move(((Trans.TransformDirection(keyInput) * MoveSpeed)+Vector3.up*ySpeed) * Time.deltaTime);
 
         //Spread when walking
-        ((DefaultSpreadController) Weapons[basicWeaponHandle.currentWeapon].weapon.mySpreadController).SetBaseSpread(keyInput.magnitude * basicWeaponHandle.WeaponSpreadWalking);
+        ((DefaultSpreadController) Weapons[basicWeaponHandle.currentWeaponId].weapon.mySpreadController).SetBaseSpread(keyInput.magnitude * basicWeaponHandle.WeaponSpreadWalking);
     }
 
     void OnShoot()
     {
-        t = Mathf.Clamp01(t + Weapons[basicWeaponHandle.currentWeapon].RecoilAmount);
+        t = Mathf.Clamp01(t + Weapons[basicWeaponHandle.currentWeaponId].RecoilAmount);
     }
 
 

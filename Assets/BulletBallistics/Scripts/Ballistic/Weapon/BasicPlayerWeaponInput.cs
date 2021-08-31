@@ -11,11 +11,15 @@ public class BasicPlayerWeaponInput : MonoBehaviour
     public float WeaponSpreadWalking;
 
     public List<WeaponData> Weapons;
-    public int currentWeapon = 0;
+    [HideInInspector]
+    public int currentWeaponId = 0;
+    [HideInInspector]
+    public WeaponData currentWeaponData;
     private int weaponBefore = -1;
 
     private void Awake()
     {
+        currentWeaponData = Weapons[currentWeaponId];
         for (int i = 0; i < Weapons.Count; i++)
         {
             Weapons[i].weapon.OnShoot += OnShoot;
@@ -25,7 +29,7 @@ public class BasicPlayerWeaponInput : MonoBehaviour
 
     private void Update()
     {
-        if (currentWeapon != -1)
+        if (currentWeaponId != -1)
         {
             HandleWeaponInput();
         }
@@ -38,17 +42,17 @@ public class BasicPlayerWeaponInput : MonoBehaviour
     private void OnShoot()
     {
         //播放枪口火花特效
-        if (Weapons[currentWeapon].particle != null)
+        if (currentWeaponData.particle != null)
         {
-            Weapons[currentWeapon].particle.Simulate(0, true, true);
-            ParticleSystem.EmissionModule module = Weapons[currentWeapon].particle.emission;
+            currentWeaponData.particle.Simulate(0, true, true);
+            ParticleSystem.EmissionModule module = currentWeaponData.particle.emission;
             module.enabled = true;
-            Weapons[currentWeapon].particle.Play(true);
+            currentWeaponData.particle.Play(true);
         }
         //播放声音特效
-        if (Weapons[currentWeapon].sound != null)
+        if (currentWeaponData.sound != null)
         {
-            Weapons[currentWeapon].sound.Play();
+            currentWeaponData.sound.Play();
         }
     }
 
@@ -68,27 +72,27 @@ public class BasicPlayerWeaponInput : MonoBehaviour
         //Shoot
         if (Input.GetMouseButton(0))
         {
-            Weapons[currentWeapon].weapon.Shoot();
+            currentWeaponData.weapon.Shoot();
         }
         if (Input.GetMouseButtonUp(0))
         {
-            Weapons[currentWeapon].weapon.StopShoot();
+            currentWeaponData.weapon.StopShoot();
         }
 
         //Aim
         if (Input.GetMouseButtonDown(1))
         {
-            Weapons[currentWeapon].weapon.Aim(true);
+            currentWeaponData.weapon.Aim(true);
         }
         if (Input.GetMouseButtonUp(1))
         {
-            Weapons[currentWeapon].weapon.Aim(false);
+            currentWeaponData.weapon.Aim(false);
         }
 
         //Reload
         if (Input.GetKeyDown(KeyCode.R))
         {
-            StartCoroutine(Reload(currentWeapon));
+            StartCoroutine(Reload());
         }
     }
 
@@ -97,13 +101,13 @@ public class BasicPlayerWeaponInput : MonoBehaviour
     /// </summary>
     /// <param name="myCurrentW">current weapon id<param>
     /// <returns></returns>
-    private IEnumerator Reload(int myCurrentW)
+    private IEnumerator Reload()
     {
         Debug.Log("Reloading...");
-        yield return new WaitForSeconds(Weapons[myCurrentW].ReloadTime);
-        if (myCurrentW == currentWeapon)
+        if (currentWeaponData.weapon != null)
         {
-            ((DefaultMagazineController)Weapons[currentWeapon].weapon.myMagazineController).Reload();
+            yield return new WaitForSeconds(currentWeaponData.ReloadTime);
+            ((DefaultMagazineController)currentWeaponData.weapon.myMagazineController).Reload();
         }
     }
 
@@ -114,27 +118,29 @@ public class BasicPlayerWeaponInput : MonoBehaviour
     {
         if (Input.mouseScrollDelta.y > 0)
         {
-            currentWeapon++;
-            if (currentWeapon >= Weapons.Count)
+            currentWeaponId++;
+            if (currentWeaponId >= Weapons.Count)
             {
-                currentWeapon = 0;
+                currentWeaponId = 0;
             }
+            currentWeaponData = Weapons[currentWeaponId];
         }
 
         if (Input.mouseScrollDelta.y < 0)
         {
-            currentWeapon--;
-            if (currentWeapon < 0)
+            currentWeaponId--;
+            if (currentWeaponId < 0)
             {
-                currentWeapon = Weapons.Count - 1;
+                currentWeaponId = Weapons.Count - 1;
             }
+            currentWeaponData = Weapons[currentWeaponId];
         }
 
-        if (weaponBefore != currentWeapon)
+        if (weaponBefore != currentWeaponId)
         {
             for (int i = 0; i < Weapons.Count; i++)
             {
-                Weapons[i].weapon.gameObject.SetActive(i == currentWeapon); //activate current Weapon
+                Weapons[i].weapon.gameObject.SetActive(i == currentWeaponId); //activate current Weapon
             }
             if (weaponBefore != -1)
             {
@@ -144,7 +150,7 @@ public class BasicPlayerWeaponInput : MonoBehaviour
 
         }
 
-        weaponBefore = currentWeapon;
+        weaponBefore = currentWeaponId;
     }
 
     /// <summary>

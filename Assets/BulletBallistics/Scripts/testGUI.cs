@@ -16,15 +16,15 @@ public class testGUI : MonoBehaviour {
     /// visualize weapon data
     /// </summary>
     void Update () {
-        if (myBasicWeaponController.currentWeapon != -1)
+        if (myBasicWeaponController.currentWeaponId != -1)
         {
-            zeroingText.text = "Zeroing: " + (myBasicWeaponController.Weapons[myBasicWeaponController.currentWeapon].weapon.TargetWeapon.currentBarrelZero == -1 ? "0" : myBasicWeaponController.Weapons[myBasicWeaponController.currentWeapon].weapon.TargetWeapon.BarrelZeroingDistances[myBasicWeaponController.Weapons[myBasicWeaponController.currentWeapon].weapon.TargetWeapon.currentBarrelZero].ToString());
+            zeroingText.text = "Zeroing: " + (myBasicWeaponController.Weapons[myBasicWeaponController.currentWeaponId].weapon.TargetWeapon.currentBarrelZero == -1 ? "0" : myBasicWeaponController.Weapons[myBasicWeaponController.currentWeaponId].weapon.TargetWeapon.BarrelZeroingDistances[myBasicWeaponController.Weapons[myBasicWeaponController.currentWeaponId].weapon.TargetWeapon.currentBarrelZero].ToString());
         }
         else {
             zeroingText.text = "Zeroing: 0";
         }
-        WeaponText.text = myBasicWeaponController.Weapons[myBasicWeaponController.currentWeapon].weapon.name;
-        DefaultMagazineController magController = (DefaultMagazineController)myBasicWeaponController.Weapons[myBasicWeaponController.currentWeapon].weapon.myMagazineController;
+        WeaponText.text = myBasicWeaponController.Weapons[myBasicWeaponController.currentWeaponId].weapon.name;
+        DefaultMagazineController magController = (DefaultMagazineController)myBasicWeaponController.Weapons[myBasicWeaponController.currentWeaponId].weapon.myMagazineController;
         BulletsText.text = magController.GetBulletsInMag().ToString();
         MagsText.text = ((int)(magController.StoredBullets / (magController.BulletsPerMag))).ToString();
 
