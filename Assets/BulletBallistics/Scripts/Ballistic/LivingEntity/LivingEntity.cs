@@ -1,20 +1,12 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Ballistics
 {
     public class LivingEntity : MonoBehaviour
     {
-        /// <summary>
-        /// maximum health
-        /// </summary>
         public float StartHealth;
+        private float myHealth = 0;
 
-        /// <summary>
-        /// health handler
-        /// </summary>
-        [HideInInspector]
         public float Health
         {
             get { return myHealth; }
@@ -41,26 +33,26 @@ namespace Ballistics
             }
         }
 
-        private float myHealth = 0;
-
-        void Awake()
+        private void Awake()
         {
             myHealth = StartHealth;
         }
 
         /// <summary>
-        /// called when health is 0
+        /// 死亡时调用
         /// </summary>
         public virtual void OnDeath()
-        { }
+        { 
+
+        }
 
         /// <summary>
-        /// called when the health value changed
+        /// 血量改变时调用
         /// </summary>
-        /// <param name="amount">value of the change</param>
+        /// <param name="amount">血量改变值</param>
         public virtual void OnHealthChanged(float amount)
         {
-
+            Debug.Log(transform.name + " took " + (-amount).ToString() + " damage");
         }
     }
 }

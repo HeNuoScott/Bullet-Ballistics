@@ -1,18 +1,62 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Ballistics
 {
     /// <summary>
-    /// inherit from ImpactObject to set up impact particles etc. ( also check DefaultImpactObject )
+    /// 弹痕物体
+    /// 播放声效 + 播放粒子特效
     /// </summary>
-    public abstract class ImpactObject : MonoBehaviour
+    public class ImpactObject : MonoBehaviour
     {
-        /// <summary>
-        /// called when this object awakes at an impact point
-        /// </summary>
-        /// <param name="data">material data of the hit object</param>
-        /// <param name="rayHit">RaycastHit of the impact</param>
-        public abstract void Hit(BallisticObjectData data, RaycastHit rayHit);
+        public float Time = 3f;
+        public List<AudioClip> HitSounds;
+        
+        private AudioSource audiosource;
+        private ParticleSystem particles;
+        private InvokeDeactivate deactivate;
+        private Transform myTrans;
+
+        private void Awake()
+        {
+            audiosource = GetComponent<AudioSource>();
+            particles = GetComponent<ParticleSystem>();
+            deactivate = GetComponent<InvokeDeactivate>();
+            myTrans = transform;
+
+            for (int i = 0; i < HitSounds.Count; i++)
+            {
+                if (HitSounds[i] == null)
+                {
+                    HitSounds.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+
+        public virtual void Hit(RaycastHit rayHit)
+        {
+            myTrans.rotation = Quaternion.LookRotation(rayHit.normal);
+            if (audiosource != null && HitSounds.Count > 0)
+            {
+                audiosource.clip = HitSounds[Random.Range(0, HitSounds.Count)];
+                audiosource.Play();
+            }
+
+            if (particles != null)
+            {
+                particles.Simulate(0, true, true);
+                ParticleSystem.EmissionModule module = particles.emission;
+                module.enabled = true;
+                particles.Play(true);
+            }
+
+            if (deactivate != null)
+            {
+                deactivate.Deactivate(Time, this.gameObject);
+            }
+
+        }
     }
 }

@@ -5,11 +5,10 @@ namespace Ballistics
 {
     public class LivingEntityCollider : MonoBehaviour
     {
-        //set (for example) to 0.75f when LivingEntity has armor
+        //伤害系数
         public float DamageMultiplier = 1;
 
-        //when LivingEntityCollider is child of a GameObject with LivingEntity 
-        //ParentLE can be set automatically through LivingEntity-Inspector (Button)
+        // 当LivingEntityCollider作为子物体时, 可以用LivingEntity按钮直接添加赋值
         public LivingEntity ParentLivingEntity;
     }
 }

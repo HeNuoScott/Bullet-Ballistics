@@ -6,11 +6,6 @@ namespace Ballistics
 {
     public class Weapon : MonoBehaviour
     {
-
-        //PUBLIC _______________________________________________________________
-
-        //General
-
         /// <summary>
         /// 子弹可视化生成点(枪口)
         /// </summary>
@@ -19,6 +14,10 @@ namespace Ballistics
         /// 真实/物理子弹的生成点(通常是屏幕的中心)  
         /// </summary>
         public Transform PhysicalBulletSpawnPoint;
+        /// <summary>
+        /// 瞄准位置
+        /// </summary>
+        public Transform ScopePos;
         /// <summary>
         /// 子弹存留时间
         /// </summary>
@@ -31,7 +30,6 @@ namespace Ballistics
         /// 初始化伤害
         /// </summary>
         public float MuzzleDamage = 80;
-
         //Bullet
         /// <summary>
         /// 初始化速度
@@ -57,8 +55,6 @@ namespace Ballistics
         /// 子弹预制体
         /// </summary>
         public Transform BulletPref;
-        //--
-
         //Zeroing
         /// <summary>
         /// 瞄准镜提供的档次 500m/1000m/1500m
@@ -74,23 +70,19 @@ namespace Ballistics
         public int currentBarrelZero = -1; //-1 equals no Correction
         public int BarrelZeroCount { get { return BarrelZeroingCorrections.Count; } }
 
-        //-----------------------------------------------------------------------
-
         private BulletHandler bulletHandler;
-
-        //Pool
-        private PoolManager myPool;
+        private BulletPoolManager myPool;
 
         //储存预先就计算的阻力以节省性能
         public float PreDrag;
         private float area;
 
-
         private void Awake()
         {
-            myPool = PoolManager.Instance;
-            bulletHandler = BulletHandler.instance;
+            myPool = BulletPoolManager.Instance;
+            bulletHandler = BulletHandler.Instance;
             if (bulletHandler == null) return;
+            if (currentBarrelZero >= BarrelZeroCount) currentBarrelZero = -1;
             RecalculatePrecalculatedValues();
         }
 
@@ -100,15 +92,12 @@ namespace Ballistics
         public void RecalculatePrecalculatedValues()
         {
             area = Mathf.Pow(Diameter / 2, 2) * Mathf.PI;
-            if (bulletHandler.Settings != null)
-            {
-                PreDrag = (0.5f * bulletHandler.Settings.AirDensity * area * DragCoefficient) / BulletMass;
+            PreDrag = (0.5f * BulletHandler.AirDensity * area * DragCoefficient) / BulletMass;
 
-                if (BarrelZeroingDistances.Count > 0)
-                {
-                    BarrelZeroingDistances.Sort();
-                    CalculateBarrelZeroCorrections();
-                }
+            if (BarrelZeroingDistances.Count > 0)
+            {
+                BarrelZeroingDistances.Sort();
+                CalculateBarrelZeroCorrections();
             }
         }
 
@@ -123,9 +112,9 @@ namespace Ballistics
                 float FlightTime;
                 float drop;
 
-                if (bulletHandler.Settings.useBulletdrag)
+                if (BulletHandler.UseBulletdrag)
                 {
-                    float k = (bulletHandler.Settings.AirDensity * DragCoefficient * Mathf.PI * (Diameter * .5f) * (Diameter * .5f)) / (2 * BulletMass);
+                    float k = (BulletHandler.AirDensity * DragCoefficient * Mathf.PI * (Diameter * .5f) * (Diameter * .5f)) / (2 * BulletMass);
                     FlightTime = (Mathf.Exp(k * BarrelZeroingDistances[i]) - 1) / (k * MaxBulletSpeed);
                 }
                 else
