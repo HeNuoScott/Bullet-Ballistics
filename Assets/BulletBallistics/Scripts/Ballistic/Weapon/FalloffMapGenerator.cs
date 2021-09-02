@@ -22,7 +22,6 @@ namespace Ballistics
         private void OnDrawGizmos()
         {
             Gizmos.matrix = transform.localToWorldMatrix;
-
             // Draw symbols
             Gizmos.color = ObjColor;
 
@@ -32,20 +31,20 @@ namespace Ballistics
             Gizmos.DrawLine(ScopePos + new Vector3(0, Size, 0), ScopePos - new Vector3(0, Size, 0));
             Gizmos.DrawLine(ScopePos + new Vector3(Size, 0, 0), ScopePos - new Vector3(Size, 0, 0));
 
-            //Eye
-            Gizmos.color = lineColor;
-            Gizmos.DrawLine(Vector3.zero, ScopePos);
-            Gizmos.color = ObjColor;
+            //// Eye
+            //Gizmos.color = lineColor;
+            //Gizmos.DrawLine(Vector3.zero, ScopePos);
+            //Gizmos.color = ObjColor;
 
-            //Barrel
-            Gizmos.color = lineColor;
-            Gizmos.DrawLine(BarrelPos, ScopePos);
-            Gizmos.color = ObjColor;
-            Gizmos.DrawWireSphere(BarrelPos, Size / 6);
+            //// Barrel
+            //Gizmos.color = lineColor;
+            //Gizmos.DrawLine(BarrelPos, ScopePos);
+            //Gizmos.color = ObjColor;
+            //Gizmos.DrawWireSphere(BarrelPos, Size / 6);
 
-            // Aim Line 
+            // Aim Line
             Gizmos.color = Color.green;
-            Gizmos.DrawLine(ScopePos, ScopePos.normalized * AimDist);
+            Gizmos.DrawLine(Vector3.zero, new Vector3(0, 0, AimDist));
         }
     }
 }

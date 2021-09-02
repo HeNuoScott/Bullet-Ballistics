@@ -8,28 +8,22 @@ namespace Ballistics
     {
         void ReAwake();
     }
+
     public class BulletPoolManager : MonoBehaviour
     {
-        private static BulletPoolManager instance = null;
-        public static BulletPoolManager Instance
+        public static BulletPoolManager Instance = null;
+
+        private void Awake()
         {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = FindObjectOfType<BulletPoolManager>();
-                    if (instance == null)
-                    {
-                        GameObject go = new GameObject("Ballistics Pool");
-                        instance = go.AddComponent<BulletPoolManager>();
-                    }
-                }
-                return instance;
-            }
+            Instance = this;
         }
 
         // 类型id 对应类型队列
         public Dictionary<int, Queue<GameObject>> Pool = new Dictionary<int, Queue<GameObject>>();
+        // 弹痕类型
+        public List<MaterialObjectType> ImpactTypes = new List<MaterialObjectType>();
+        // 弹痕预制体
+        public List<ImpactObject> ImpactObjects = new List<ImpactObject>();
 
         /// <summary>
         /// 添加一个物体进对象池
@@ -67,6 +61,21 @@ namespace Ballistics
                     IPoolingObject pObj = obj.GetComponent<IPoolingObject>();
                     if (pObj != null) pObj.ReAwake();
                     return obj;
+                }
+            }
+            return null;
+        }
+
+        public GameObject GetImpactPerfab(MaterialObjectType type)
+        {
+            if (ImpactTypes.Contains(type))
+            {
+                for (int i = 0; i < ImpactTypes.Count; i++)
+                {
+                    if (ImpactTypes[i] == type && ImpactObjects[i] != null)
+                    {
+                        return ImpactObjects[i].gameObject;
+                    }
                 }
             }
             return null;

@@ -14,11 +14,13 @@ namespace Ballistics
         /// <summary> 子弹是否计算弹道材质 </summary>
         public static bool UseBallisticMaterials = true;
         /// <summary> 子弹是否散射 </summary>
-        public static bool UseSpreadMaterials = true;
+        public static bool UseSpreadMaterials = false;
         /// <summary> 空气密度 </summary>
-        public static float AirDensity = 1.14f;
+        public static float AirDensity = 1f;
         /// <summary> 风向 </summary>
-        public static Vector3 WindDirection = new Vector3(10,0,0);
+        public static Vector3 WindDirection = new Vector3(0,0,0);
+        /// <summary> 编辑器动态调节 </summary>
+        public static bool IsDynamicEditor = false;
 
         [HideInInspector]
         public Queue<BulletData> Bullets = new Queue<BulletData>();
@@ -58,10 +60,12 @@ namespace Ballistics
         private float g;
         private BulletData[] bulletListTmp;
 
-        private void Awake()
+        private void Start()
         {
             g = Physics.gravity.y;
             myPool = BulletPoolManager.Instance;
+
+            if (!Application.isEditor) IsDynamicEditor = false;
         }
 
         private void LateUpdate()
@@ -74,7 +78,7 @@ namespace Ballistics
         /// </summary>
         private void UpdateBullets()
         {
-            float deltaTime = Time.deltaTime;
+            float deltaTime = IsDynamicEditor ? 0.0166667f : Time.deltaTime;
 
             //predefined variables
             BulletData cBullet;
@@ -98,10 +102,6 @@ namespace Ballistics
             float myDeltaTime = 0;
             bool processAgain = true;
 
-#if UNITY_EDITOR
-            BulletDebugger debugger = null;
-#endif
-
             //Process each Bullet
             for (int i = 0; i < Bullets.Count; i++)
             {
@@ -110,17 +110,6 @@ namespace Ballistics
                     cBullet = Bullets.Dequeue();
 
                     cWeapon = cBullet.parentWeapon;
-
-#if UNITY_EDITOR
-                    if (cBullet.BulletTrans != null)
-                    {
-                        debugger = cBullet.BulletTrans.GetComponent<BulletDebugger>();
-                    }
-                    else
-                    {
-                        debugger = null;
-                    }
-#endif
 
                     processAgain = true;
                     while (processAgain)
@@ -167,13 +156,6 @@ namespace Ballistics
 
 
                         //Move Bullet
-#if UNITY_EDITOR
-                        if (debugger != null)
-                        {
-                            debugger.AddPos(cBullet.bulletPos);
-                        }
-#endif
-
                         cBullet.bulletPos += cBullet.bulletDir * cBullet.Speed * myDeltaTime;
 
                         if (UseBulletdrop)
@@ -218,13 +200,7 @@ namespace Ballistics
                                 }
 
                                 BulletHit(cWeapon, hitLivingEntity, hitRigid, cBullet.bulletDir, hit.point, rBulletSpeed, BulletEnergy * 2f);
-
-#if UNITY_EDITOR
-                                if (debugger != null)
-                                {
-                                    debugger.AddPos(hit.point);
-                                }
-#endif                            
+                
                                 //Stop Bullet
                                 DeactivateBullet(cWeapon, cBullet.BulletTrans);
                                 processAgain = false;
@@ -242,7 +218,7 @@ namespace Ballistics
                                 //call BulletImpact on the hitBallisticObject
                                 hitBallisticObject.BulletImpact(hit);
 
-                                if (UseBallisticMaterials)
+                                if (UseSpreadMaterials)
                                 {
                                     Vector3 dirNorm = dir.normalized;
                                     //does this bullet ricochet=
@@ -295,13 +271,6 @@ namespace Ballistics
                                             BulletHit(cWeapon, hitLivingEntity, hitRigid, cBullet.bulletDir, hit.point, diffSpeed, (0.5f * cWeapon.BulletMass * diffSpeed * diffSpeed) / dist);
                                             cBullet.bulletPos = cBullet.LastPos = outHit.point;
 
-#if UNITY_EDITOR
-                                            if (debugger != null)
-                                            {
-                                                debugger.AddPos(cBullet.bulletPos);
-                                            }
-#endif
-
                                             processAgain = true;
                                             continue;
                                         }
@@ -310,13 +279,6 @@ namespace Ballistics
                                             //Bullet stuck in object
 
                                             BulletHit(cWeapon, hitLivingEntity, hitRigid, cBullet.bulletDir, hit.point, rBulletSpeed, BulletEnergy / MaxRange);
-
-#if UNITY_EDITOR
-                                            if (debugger != null)
-                                            {
-                                                debugger.AddPos(hit.point);
-                                            }
-#endif
 
                                             //Stop Bullet
                                             DeactivateBullet(cWeapon, cBullet.BulletTrans);
@@ -349,13 +311,6 @@ namespace Ballistics
                                         //process Bullet again
                                         cBullet.bulletPos = cBullet.LastPos = hit.point;
 
-#if UNITY_EDITOR
-                                        if (debugger != null)
-                                        {
-                                            debugger.AddPos(cBullet.bulletPos);
-                                        }
-#endif
-
                                         processAgain = true;
                                         continue;
                                     }
@@ -365,13 +320,6 @@ namespace Ballistics
                                 else
                                 {
                                     BulletHit(cWeapon, hitLivingEntity, hitRigid, cBullet.bulletDir, hit.point, rBulletSpeed, BulletEnergy * 2);
-
-#if UNITY_EDITOR
-                                    if (debugger != null)
-                                    {
-                                        debugger.AddPos(hit.point);
-                                    }
-#endif
 
                                     //stop bullet
                                     DeactivateBullet(cWeapon, cBullet.BulletTrans);
@@ -395,7 +343,6 @@ namespace Ballistics
                                 cBullet.VisualOffset = Vector3.zero;
                             }
                             cBullet.BulletTrans.position = cBullet.bulletPos + cBullet.VisualOffset;
-
                             cBullet.BulletTrans.rotation = Quaternion.LookRotation(dir);
                         }
                         //Enqueue at End
@@ -404,7 +351,7 @@ namespace Ballistics
                 }
                 else
                 {
-                    bulletListTmp[i - MaxBulletUpdatesPerFrame].timeSinceLastUpdate += Time.deltaTime;
+                    bulletListTmp[i - MaxBulletUpdatesPerFrame].timeSinceLastUpdate += deltaTime; 
                 }
             }
         }
@@ -437,7 +384,6 @@ namespace Ballistics
             }
         }
 
-
         /// <summary>
         /// 添加一个子弹回对象池
         /// </summary>
@@ -449,7 +395,7 @@ namespace Ballistics
             {
                 GameObject go = bulletTrans.gameObject;
                 go.SetActive(false);
-                myPool.AddObject(weapon.BulletPref.gameObject, go);
+                myPool.AddObject(weapon.BulletPrefab.gameObject, go);
             }
         }
     }

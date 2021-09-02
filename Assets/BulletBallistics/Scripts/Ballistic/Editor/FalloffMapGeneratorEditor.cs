@@ -10,7 +10,7 @@ namespace Ballistics
     {
         private FalloffMapGenerator t;
         private bool ShowZeroList = true;
-
+        private bool isGizmosTexture = false;
         private void OnEnable()
         {
             t = (FalloffMapGenerator)target;
@@ -26,6 +26,10 @@ namespace Ballistics
         {
             EditorGUILayout.LabelField("武器瞄准点设置", EditorStyles.boldLabel);
             EditorGUILayout.Space();
+            t.AimDist = Mathf.Clamp(EditorGUILayout.FloatField("瞄准线距离", t.AimDist), 100f, float.MaxValue);
+
+            isGizmosTexture = EditorGUILayout.ToggleLeft("生成瞄准镜贴图", isGizmosTexture);
+            if (!isGizmosTexture) return;
 
             if (t.TargetWeapon == null)
             {
@@ -43,7 +47,7 @@ namespace Ballistics
             EditorGUI.indentLevel++;
 
             t.ScopeDist = Mathf.Clamp(EditorGUILayout.FloatField("瞄准距离", t.ScopeDist), 0.05f, float.MaxValue);
-            t.AimDist = Mathf.Clamp(EditorGUILayout.FloatField("瞄准线距离", t.AimDist), 100f, float.MaxValue);
+
             t.BarrelPos = EditorGUILayout.Vector3Field("枪口位置", t.BarrelPos);
             t.TextureSize = Mathf.Clamp((EditorGUILayout.IntField("贴图大小", t.TextureSize) / 2) * 2, 128, 2048);
 

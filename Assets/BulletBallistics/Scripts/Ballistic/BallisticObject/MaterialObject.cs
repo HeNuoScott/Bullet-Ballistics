@@ -31,25 +31,18 @@ namespace Ballistics
         /// </summary>
         public AnimationCurve RicochetPropability;
 
-        /// <summary>
-        /// 材料对应的弹痕
-        /// </summary>
-        public ImpactObject impactObject;
-
-        /// <summary>
-        /// initializes bullet impact at a rayhit
-        /// </summary>
         public virtual void BulletImpact(RaycastHit rayHit)
         {
             Debug.Log("击中回调!");
+            GameObject  impactObject = BulletPoolManager.Instance.GetImpactPerfab(Type);
             if (impactObject != null)
             {
                 //get instance of impactObject
-                GameObject impactGO = BulletPoolManager.Instance.GetNextGameObject(impactObject.gameObject);
+                GameObject impactGO = BulletPoolManager.Instance.GetNextGameObject(this.gameObject);
 
                 if (impactGO == null)
                 {
-                    impactGO = Instantiate(impactObject.gameObject);
+                    impactGO = Instantiate(impactObject);
                     impactGO.transform.SetParent(BulletPoolManager.Instance.transform);
                 }
 
@@ -58,7 +51,7 @@ namespace Ballistics
                 impactGO.transform.position = rayHit.point;
 
                 ImpactObject myImpact = impactGO.GetComponent<ImpactObject>();
-                if (myImpact != null) myImpact.Hit(rayHit);
+                if (myImpact != null) myImpact.Hit(rayHit, this.gameObject);
             }
         }
     }

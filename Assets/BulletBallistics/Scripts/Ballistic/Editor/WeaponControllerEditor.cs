@@ -33,8 +33,8 @@ namespace Ballistics
             TargetWeaponController.TargetWeapon = (Weapon)EditorGUILayout.ObjectField("控制武器", TargetWeaponController.TargetWeapon, typeof(Weapon), true);
             TargetWeaponController.sound = (AudioSource)EditorGUILayout.ObjectField("音效控制", TargetWeaponController.sound, typeof(AudioSource), true);
             TargetWeaponController.particle = (ParticleSystem)EditorGUILayout.ObjectField("枪口特效", TargetWeaponController.particle, typeof(ParticleSystem), true);
+            TargetWeaponController.ScopePos = (Transform)EditorGUILayout.ObjectField("狙击视野位置", TargetWeaponController.ScopePos, typeof(Transform), true);
             TargetWeaponController.ShootDelay = EditorGUILayout.FloatField("开火间隔", TargetWeaponController.ShootDelay);
-            TargetWeaponController.WeaponSpreadWalking = EditorGUILayout.FloatField("行走准心偏差", TargetWeaponController.WeaponSpreadWalking);
             TargetWeaponController.RecoilAmount = EditorGUILayout.FloatField("后坐力系数", TargetWeaponController.RecoilAmount);
             TargetWeaponController.AttackTime = EditorGUILayout.FloatField("后坐力枪口上翘时间", TargetWeaponController.AttackTime);
             TargetWeaponController.HoldTime = EditorGUILayout.FloatField("枪口上翘保持时间", TargetWeaponController.HoldTime);

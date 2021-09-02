@@ -23,22 +23,30 @@ namespace Ballistics
 
             EditorGUILayout.LabelField("通用设置", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
-
+            if (GUILayout.Button("瞄准点角度矫正"))
+            {
+                if (TargetWeapon.AimStartPoint == null && TargetWeapon.AimEndPoint == null)
+                {
+                    Debug.LogError("请先设置瞄准点!!");
+                }
+                TargetWeapon.AimStartPoint.LookAt(TargetWeapon.AimEndPoint);
+            }
             TargetWeapon.VisualSpawnPoint = (Transform)EditorGUILayout.ObjectField("枪口特效位置", TargetWeapon.VisualSpawnPoint, typeof(Transform), true);
-            TargetWeapon.PhysicalBulletSpawnPoint = (Transform)EditorGUILayout.ObjectField("子弹生成位置", TargetWeapon.PhysicalBulletSpawnPoint, typeof(Transform), true);
-            TargetWeapon.ScopePos = (Transform)EditorGUILayout.ObjectField("狙击位置", TargetWeapon.ScopePos, typeof(Transform), true);
+            TargetWeapon.AimStartPoint = (Transform)EditorGUILayout.ObjectField("瞄准点(起点)", TargetWeapon.AimStartPoint, typeof(Transform), true);
+            TargetWeapon.AimEndPoint = (Transform)EditorGUILayout.ObjectField("瞄准点(终点)", TargetWeapon.AimEndPoint, typeof(Transform), true);
             TargetWeapon.LifeTimeOfBullets = EditorGUILayout.FloatField("子弹存留时间", TargetWeapon.LifeTimeOfBullets);
             TargetWeapon.MuzzleDamage = EditorGUILayout.FloatField("枪口伤害", TargetWeapon.MuzzleDamage);
             TargetWeapon.HitMask = LayerMaskField("碰撞层级", TargetWeapon.HitMask);
+            BulletHandler.IsDynamicEditor = EditorGUILayout.ToggleLeft("动态调节瞄准点", BulletHandler.IsDynamicEditor);
+            if (BulletHandler.IsDynamicEditor) TargetWeapon.AimDistOffset = EditorGUILayout.FloatField("误差距离", TargetWeapon.AimDistOffset);
 
             EditorGUILayout.Space();
             EditorGUI.indentLevel--;
             EditorGUILayout.LabelField("子弹设置", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
 
-            TargetWeapon.BulletPref = (Transform)EditorGUILayout.ObjectField("子弹预制体", TargetWeapon.BulletPref, typeof(Transform), true);
+            TargetWeapon.BulletPrefab = (Transform)EditorGUILayout.ObjectField("子弹预制体", TargetWeapon.BulletPrefab, typeof(Transform), true);
             TargetWeapon.MaxBulletSpeed = EditorGUILayout.FloatField("子弹初速度", TargetWeapon.MaxBulletSpeed);
-            TargetWeapon.randomSpeedOffset = EditorGUILayout.FloatField("初速度偏差", TargetWeapon.randomSpeedOffset);
             TargetWeapon.BulletMass = EditorGUILayout.FloatField("子弹质量", TargetWeapon.BulletMass);
 
             EditorGUI.indentLevel++;
@@ -79,6 +87,8 @@ namespace Ballistics
             }
             EditorGUI.indentLevel -= 2;
             EditorGUILayout.Space();
+            // 动态保存
+            if (BulletHandler.IsDynamicEditor && GUI.changed) EditorUtility.SetDirty(TargetWeapon);
         }
 
         public static LayerMask LayerMaskField(string label, LayerMask selected)
@@ -135,10 +145,10 @@ namespace Ballistics
 
             if (showSpecial)
             {
-                layers.Add((selected.value == 0 ? "[X] " : "     ") + "Nothing");
+                layers.Add((selected.value == 0 ? "[√] " : "     ") + "Nothing");
                 layerNumbers.Add(-2);
 
-                layers.Add((selected.value == -1 ? "[X] " : "     ") + "Everything");
+                layers.Add((selected.value == -1 ? "[√] " : "     ") + "Everything");
                 layerNumbers.Add(-3);
             }
 
@@ -151,7 +161,7 @@ namespace Ballistics
                 {
                     if (selected == (selected | (1 << i)))
                     {
-                        layers.Add("[X] " + layerName);
+                        layers.Add("[√] " + layerName);
                     }
                     else
                     {

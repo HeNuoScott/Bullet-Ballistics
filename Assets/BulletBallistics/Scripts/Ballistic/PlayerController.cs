@@ -11,6 +11,7 @@ namespace Ballistics
         CharacterController controller;
         Camera Cam;
         public BasicPlayerWeaponInput basicWeaponHandle;
+        public WeaponController TargetWeaponController;
         public Camera WeaponCam;
 
         public float MoveSpeed;
@@ -29,30 +30,25 @@ namespace Ballistics
 
         private void Awake()
         {
-            Trans = this.transform;
-            controller = GetComponent<CharacterController>();
-            Cam = Camera.main;
-            startFov = Cam.fieldOfView;
-            StartHandPos = HandTrans.localPosition;
-            StartHandEuler = HandTrans.localEulerAngles;
+            //Trans = this.transform;
+            //controller = GetComponent<CharacterController>();
+            //Cam = Camera.main;
+            //startFov = Cam.fieldOfView;
+            //StartHandPos = HandTrans.localPosition;
+            //StartHandEuler = HandTrans.localEulerAngles;
 
-            basicWeaponHandle.CurrentWeapon.OnShoot += OnShoot;
+            //basicWeaponHandle.CurrentWeapon.OnShoot += OnShoot;
         }
 
         private void Update()
         {
-            if (Cursor.visible || Cursor.lockState != CursorLockMode.Confined)
-            {
-                Cursor.visible = false;
-                Cursor.lockState = CursorLockMode.Confined;
-            }
 
-            if (basicWeaponHandle.CurrentWeapon != null)
-            {
-                Recoil();
-                Aim();
-            }
-            Move();
+            //if (basicWeaponHandle.CurrentWeapon != null)
+            //{
+            //    Recoil();
+            //    Aim();
+            //}
+            // Move();
 
             //slowmo
             Time.timeScale = Mathf.Lerp(Time.timeScale, Input.GetKey(KeyCode.LeftShift) ? 0.05f : 1, Time.deltaTime * 30);
@@ -66,7 +62,7 @@ namespace Ballistics
         {
             if (basicWeaponHandle.CurrentWeapon.isAiming)
             {
-                Vector3 scopePos = basicWeaponHandle.CurrentWeapon.TargetWeapon.ScopePos.localPosition;
+                Vector3 scopePos = TargetWeaponController.ScopePos.localPosition;
                 HandTrans.localPosition = new Vector3(-scopePos.x, -scopePos.y, -scopePos.z);
             }
             WeaponCam.fieldOfView = Cam.fieldOfView = Mathf.Lerp(Cam.fieldOfView, startFov * (basicWeaponHandle.CurrentWeapon.isAiming ? 0.4f : 1f), Time.deltaTime * 15);
@@ -117,9 +113,6 @@ namespace Ballistics
             }
 
             controller.Move(((Trans.TransformDirection(keyInput) * MoveSpeed) + Vector3.up * ySpeed) * Time.deltaTime);
-
-            //Spread when walking
-            basicWeaponHandle.CurrentWeapon.SetBaseSpread(keyInput.magnitude * basicWeaponHandle.CurrentWeapon.WeaponSpreadWalking);
         }
 
         private void OnShoot()

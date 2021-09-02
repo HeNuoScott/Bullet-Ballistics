@@ -9,11 +9,11 @@ namespace Ballistics
     public class InvokeDeactivate : MonoBehaviour
     {
         private BulletPoolManager myPool;
-        private GameObject InstanceOf;
+        private GameObject myOwner;
 
-        public void Deactivate(float t, GameObject _instanceOf)
+        public void Deactivate(float t, GameObject owner)
         {
-            InstanceOf = _instanceOf;
+            myOwner = owner;
             Invoke("invokeCall", t);
         }
 
@@ -21,7 +21,7 @@ namespace Ballistics
         {
             this.gameObject.SetActive(false);
             if (myPool == null) myPool = BulletPoolManager.Instance;
-            myPool.AddObject(InstanceOf, this.gameObject);
+            myPool.AddObject(myOwner, this.gameObject);
         }
     }
 }

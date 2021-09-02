@@ -13,19 +13,20 @@ namespace Ballistics
 
         public AudioSource sound;
         public ParticleSystem particle;
-
+        /// <summary>
+        /// 瞄准位置
+        /// </summary>
+        public Transform ScopePos;
         /// <summary>
         /// Time to go from start- to max-spread
         /// 从静止到 上翘最大值所需时间
         /// </summary>
         public float AttackTime;
-
         /// <summary>
         /// Time until spread release
         /// 枪口在上翘最高点停留时间
         /// </summary>
         public float HoldTime;
-
         /// <summary>
         /// Time to go from max- to start-spread
         /// 从上翘最大值 恢复静止所需时间
@@ -39,15 +40,8 @@ namespace Ballistics
         /// 后坐力
         /// </summary>
         public float RecoilAmount;
-
-        /// <summary>
-        /// 玩家行走时准心散开程度
-        /// </summary>
-        public float WeaponSpreadWalking;
         private float currentSpread;
-
         private float shootTimer = 0;
-        private float baseSpread = 0;
         public float ShootDelay = 0.25f;
         public ShootingType WeaponType = ShootingType.SingleShot;
 
@@ -72,13 +66,6 @@ namespace Ballistics
         public bool isAiming;
 
         public event Action OnShoot;
-
-        BulletHandler bulletHandler = null;
-
-        private void Awake()
-        {
-            bulletHandler = BulletHandler.Instance;
-        }
 
         private void Update()
         {
@@ -105,7 +92,7 @@ namespace Ballistics
                 switch (WeaponType)
                 {
                     case ShootingType.Auto://自动模式
-                        TargetWeapon.ShootBullet(GetCurrentSpread(TargetWeapon.PhysicalBulletSpawnPoint));
+                        TargetWeapon.ShootBullet();
                         CallOnShoot();
                         break;
                     case ShootingType.Burst://单次多发(散弹枪)
@@ -113,7 +100,7 @@ namespace Ballistics
                         {
                             for (int i = 0; i < BulletsPerShot; i++)
                             {
-                                TargetWeapon.ShootBullet(GetCurrentSpread(TargetWeapon.PhysicalBulletSpawnPoint));
+                                TargetWeapon.ShootBullet();
                             }
                             CallOnShoot();
                             shootReset = false;
@@ -123,7 +110,7 @@ namespace Ballistics
 
                         if (shootReset)
                         {
-                            TargetWeapon.ShootBullet(GetCurrentSpread(TargetWeapon.PhysicalBulletSpawnPoint));
+                            TargetWeapon.ShootBullet();
                             SalvesBulletCounter++;
                             CallOnShoot();
                             shootReset = false;
@@ -133,7 +120,7 @@ namespace Ballistics
                     case ShootingType.SingleShot://单发
                         if (shootReset)
                         {
-                            TargetWeapon.ShootBullet(GetCurrentSpread(TargetWeapon.PhysicalBulletSpawnPoint));
+                            TargetWeapon.ShootBullet();
                             CallOnShoot();
                             shootReset = false;
                         }
@@ -150,7 +137,7 @@ namespace Ballistics
             while (SalvesBulletCounter < BulletsPerShot)
             {
                 yield return new WaitForSeconds(SalveBulletShootDelay);
-                TargetWeapon.ShootBullet(GetCurrentSpread(TargetWeapon.PhysicalBulletSpawnPoint));
+                TargetWeapon.ShootBullet();
                 SalvesBulletCounter++;
                 CallOnShoot();
                 if (SalvesBulletCounter >= BulletsPerShot)
@@ -182,32 +169,6 @@ namespace Ballistics
         public float RecoilCorrectionTime()
         {
             return ReleaseTime;
-        }
-
-        /// <summary>
-        /// 获取当前发射方向
-        /// </summary>
-        public virtual Vector3 GetCurrentSpread(Transform spawn)
-        {
-            if (bulletHandler != null && BulletHandler.UseSpreadMaterials)
-            {
-                float spread = currentSpread / 2 + baseSpread;
-                return (Quaternion.AngleAxis(UnityEngine.Random.Range(0, 360), spawn.forward) * (Quaternion.AngleAxis(UnityEngine.Random.Range(0, spread), spawn.right)) * spawn.forward);
-            }
-            else return spawn.forward;
-        }
-
-        /// <summary>
-        /// 获取弹射角度
-        /// </summary>
-        public virtual float GetSpreadAngle()
-        {
-            return currentSpread;
-        }
-
-        public virtual void SetBaseSpread(float spread)
-        {
-            baseSpread = spread;
         }
     }
 

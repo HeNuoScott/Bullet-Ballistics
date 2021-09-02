@@ -35,7 +35,7 @@ namespace Ballistics
             }
         }
 
-        public virtual void Hit(RaycastHit rayHit)
+        public virtual void Hit(RaycastHit rayHit, GameObject owner)
         {
             myTrans.rotation = Quaternion.LookRotation(rayHit.normal);
             if (audiosource != null && HitSounds.Count > 0)
@@ -54,7 +54,7 @@ namespace Ballistics
 
             if (deactivate != null)
             {
-                deactivate.Deactivate(Time, this.gameObject);
+                deactivate.Deactivate(Time, owner);
             }
 
         }

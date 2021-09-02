@@ -10,14 +10,8 @@ namespace Ballistics
         /// 子弹可视化生成点(枪口)
         /// </summary>
         public Transform VisualSpawnPoint;
-        /// <summary>
-        /// 真实/物理子弹的生成点(通常是屏幕的中心)  
-        /// </summary>
-        public Transform PhysicalBulletSpawnPoint;
-        /// <summary>
-        /// 瞄准位置
-        /// </summary>
-        public Transform ScopePos;
+        public Transform AimStartPoint;
+        public Transform AimEndPoint;
         /// <summary>
         /// 子弹存留时间
         /// </summary>
@@ -30,15 +24,12 @@ namespace Ballistics
         /// 初始化伤害
         /// </summary>
         public float MuzzleDamage = 80;
+        public float AimDistOffset = 5;
         //Bullet
         /// <summary>
         /// 初始化速度
         /// </summary>
         public float MaxBulletSpeed = 550;
-        /// <summary>
-        /// 子弹速度的随机性
-        /// </summary>
-        public float randomSpeedOffset = 10;
         /// <summary>
         /// 子弹质量
         /// </summary>
@@ -54,7 +45,7 @@ namespace Ballistics
         /// <summary>
         /// 子弹预制体
         /// </summary>
-        public Transform BulletPref;
+        public Transform BulletPrefab;
         //Zeroing
         /// <summary>
         /// 瞄准镜提供的档次 500m/1000m/1500m
@@ -77,15 +68,22 @@ namespace Ballistics
         public float PreDrag;
         private float area;
 
-        private void Awake()
+        private void Start()
         {
             myPool = BulletPoolManager.Instance;
             bulletHandler = BulletHandler.Instance;
             if (bulletHandler == null) return;
-            if (currentBarrelZero >= BarrelZeroCount) currentBarrelZero = -1;
             RecalculatePrecalculatedValues();
         }
 
+        private void OnDrawGizmos()
+        {
+            if (BulletHandler.IsDynamicEditor)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(AimStartPoint.position, AimStartPoint.position + AimStartPoint.forward * 1000f);
+            }
+        }
         /// <summary>
         /// 计算基本不变的值
         /// </summary>
@@ -109,25 +107,26 @@ namespace Ballistics
             BarrelZeroingCorrections.Clear();
             for (int i = 0; i < BarrelZeroingDistances.Count; i++)
             {
+                float FlightDistance = BarrelZeroingDistances[i] + AimDistOffset;
                 float FlightTime;
                 float drop;
 
                 if (BulletHandler.UseBulletdrag)
                 {
-                    float k = (BulletHandler.AirDensity * DragCoefficient * Mathf.PI * (Diameter * .5f) * (Diameter * .5f)) / (2 * BulletMass);
-                    FlightTime = (Mathf.Exp(k * BarrelZeroingDistances[i]) - 1) / (k * MaxBulletSpeed);
+                    float k = (BulletHandler.AirDensity * DragCoefficient * Mathf.PI * (Diameter * 0.5f) * (Diameter * 0.5f)) / (2 * BulletMass);
+                    FlightTime = (Mathf.Exp(k * FlightDistance) - 1) / (k * MaxBulletSpeed);
                 }
                 else
                 {
-                    FlightTime = BarrelZeroingDistances[i] / MaxBulletSpeed;
+                    FlightTime = FlightDistance / MaxBulletSpeed;
                 }
 
-                drop = (.5f * -Physics.gravity.y * Mathf.Pow(FlightTime, 2));
+                drop = (0.5f * -Physics.gravity.y * Mathf.Pow(FlightTime, 2));
 
                 //scope height above barrel
-                drop -= VisualSpawnPoint.localPosition.y;
+                float result = 360f - Mathf.Atan(drop / FlightDistance) * Mathf.Rad2Deg;
 
-                BarrelZeroingCorrections.Add(360f - Mathf.Atan(drop / BarrelZeroingDistances[i]) * Mathf.Rad2Deg);
+                BarrelZeroingCorrections.Add(result);
             }
         }
 
@@ -135,29 +134,30 @@ namespace Ballistics
         /// 实例化子弹 并将子弹交给BulletHandler计算
         /// </summary>
         /// <param name="ShootDirection">子弹发射的方向(通常你想要使用‘PhysicalBulletSpawnPoint’。 向前，这个方向)  </param>
-        public void ShootBullet(Vector3 ShootDirection)
+        public void ShootBullet()
         {
             Transform bClone = null;
-            if (BulletPref != null)
+            if (BulletPrefab != null)
             {
-                GameObject cGO = myPool.GetNextGameObject(BulletPref.gameObject);
+                GameObject cGO = myPool.GetNextGameObject(BulletPrefab.gameObject);
                 if (cGO == null)
                 {
-                    bClone = (Transform)Instantiate(BulletPref, VisualSpawnPoint.position, Quaternion.identity);
+                    bClone = (Transform)Instantiate(BulletPrefab, VisualSpawnPoint.position, Quaternion.identity);
                     bClone.SetParent(myPool.transform);
                 }
                 else
                 {
-                    cGO.SetActive(true);
                     bClone = cGO.transform;
                     bClone.position = VisualSpawnPoint.position;
                 }
+                bClone.gameObject.SetActive(true);
             }
+            if (BulletHandler.IsDynamicEditor) CalculateBarrelZeroCorrections();
             //calculte in zeroing corrections
-            Vector3 dir = (currentBarrelZero != -1 ? Quaternion.AngleAxis(BarrelZeroingCorrections[currentBarrelZero], PhysicalBulletSpawnPoint.right) * ShootDirection : ShootDirection);
-
-            //give the BulletInstace over to the BulletHandler
-            bulletHandler.Bullets.Enqueue(new BulletData(this, PhysicalBulletSpawnPoint.position, VisualSpawnPoint.position - PhysicalBulletSpawnPoint.position, dir, LifeTimeOfBullets, randomSpeedOffset == 0 ? MaxBulletSpeed : MaxBulletSpeed + UnityEngine.Random.Range(0f, randomSpeedOffset) - randomSpeedOffset / 2f, bClone));
+            //Vector3 dir = (currentBarrelZero != -1 ? Quaternion.AngleAxis(BarrelZeroingCorrections[currentBarrelZero], AimStartPoint.right) * AimStartPoint.forward : AimStartPoint.forward);
+            Vector3 dir = (currentBarrelZero != -1 ? Quaternion.AngleAxis(BarrelZeroingCorrections[currentBarrelZero], Vector3.right) * AimStartPoint.forward : AimStartPoint.forward);
+            //bulletHandler.Bullets.Enqueue(new BulletData(this, VisualSpawnPoint.position, Vector3.zero, dir, LifeTimeOfBullets, MaxBulletSpeed, bClone));
+            bulletHandler.Bullets.Enqueue(new BulletData(this, AimStartPoint.position, VisualSpawnPoint.position - AimStartPoint.position, dir, LifeTimeOfBullets, MaxBulletSpeed, bClone));
         }
 
         /// <summary>
