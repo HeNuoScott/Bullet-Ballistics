@@ -7,33 +7,8 @@ namespace Ballistics
 {
     public class BulletHandler : MonoBehaviour
     {
-        /// <summary> 子弹是否坠落 </summary>
-        public static bool UseBulletdrop = true;
-        /// <summary> 子弹是否收到阻力 </summary>
-        public static bool UseBulletdrag = true;
-        /// <summary> 子弹是否计算弹道材质 </summary>
-        public static bool UseBallisticMaterials = true;
-        /// <summary> 子弹是否散射 </summary>
-        public static bool UseSpreadMaterials = false;
-        /// <summary> 空气密度 </summary>
-        public static float AirDensity = 1f;
-        /// <summary> 风向 </summary>
-        public static Vector3 WindDirection = new Vector3(0,0,0);
-        /// <summary> 编辑器动态调节 </summary>
-        public static bool IsDynamicEditor = false;
-
         [HideInInspector]
         public Queue<BulletData> Bullets = new Queue<BulletData>();
-
-        /// <summary>
-        /// 每帧计算子弹的最大数量
-        /// </summary>
-        public int MaxBulletUpdatesPerFrame = 500;
-
-        /// <summary>
-        /// 子弹可视化到计算出的虚拟子弹所需的时间  
-        /// </summary>
-        public float VisualBulletToRealBulletMovementTime = 0.1f;
 
         private static BulletHandler instance;
         public static BulletHandler Instance
@@ -52,9 +27,8 @@ namespace Ballistics
                 return instance;
             }
         }
-        
-
         private BulletPoolManager myPool;
+        private BallisticsSettings settings;
 
         //private
         private float g;
@@ -64,8 +38,8 @@ namespace Ballistics
         {
             g = Physics.gravity.y;
             myPool = BulletPoolManager.Instance;
-
-            if (!Application.isEditor) IsDynamicEditor = false;
+            settings = BallisticsSettings.Instance;
+            if (!Application.isEditor) BallisticsSettings.Instance.IsDynamicEditor = false;
         }
 
         private void LateUpdate()
@@ -78,7 +52,7 @@ namespace Ballistics
         /// </summary>
         private void UpdateBullets()
         {
-            float deltaTime = IsDynamicEditor ? 0.0166667f : Time.deltaTime;
+            float deltaTime = BallisticsSettings.Instance.IsDynamicEditor ? 0.0166667f : Time.deltaTime;
 
             //predefined variables
             BulletData cBullet;
@@ -86,7 +60,7 @@ namespace Ballistics
             Ray ray;
             RaycastHit hit;
             Transform hitTrans;
-            if (Bullets.Count > MaxBulletUpdatesPerFrame)
+            if (Bullets.Count > settings.MaxBulletUpdatesPerFrame)
             {
                 bulletListTmp = Bullets.ToArray();
             }
@@ -96,7 +70,7 @@ namespace Ballistics
             MaterialObject hitBallisticObject;
 
             //is windy?
-            bool isWindy = WindDirection.sqrMagnitude > 0;
+            bool isWindy = settings.WindDirection.sqrMagnitude > 0;
 
             float leftOverFlyTime = 0;
             float myDeltaTime = 0;
@@ -105,7 +79,7 @@ namespace Ballistics
             //Process each Bullet
             for (int i = 0; i < Bullets.Count; i++)
             {
-                if (i < MaxBulletUpdatesPerFrame)
+                if (i < settings.MaxBulletUpdatesPerFrame)
                 {
                     cBullet = Bullets.Dequeue();
 
@@ -142,14 +116,14 @@ namespace Ballistics
                             continue;
                         }
 
-                        if (UseBulletdrag)
+                        if (settings.UseBulletdrag)
                         {
                             //Air resistence
                             cBullet.Speed -= cWeapon.PreDrag * ((cBullet.Speed * cBullet.Speed)) * myDeltaTime;
                             //Wind Influence
                             if (isWindy)
                             {
-                                cBullet.bulletDir += ((WindDirection * cWeapon.DragCoefficient * AirDensity) / cBullet.Speed) * myDeltaTime;
+                                cBullet.bulletDir += ((settings.WindDirection * cWeapon.DragCoefficient * settings.AirDensity) / cBullet.Speed) * myDeltaTime;
                                 cBullet.bulletDir.Normalize();
                             }
                         }
@@ -158,12 +132,12 @@ namespace Ballistics
                         //Move Bullet
                         cBullet.bulletPos += cBullet.bulletDir * cBullet.Speed * myDeltaTime;
 
-                        if (UseBulletdrop)
+                        if (settings.UseBulletdrop)
                         {
                             //Bulletdrop
                             cBullet.ySpeed += g * myDeltaTime;
 
-                            if (UseBulletdrag)
+                            if (settings.UseBulletdrag)
                             {
                                 cBullet.ySpeed += cWeapon.PreDrag * ((cBullet.ySpeed * cBullet.ySpeed)) * myDeltaTime;
                             }
@@ -187,7 +161,7 @@ namespace Ballistics
                             hitLivingEntity = null;
                             hitBallisticObject = null;
 
-                            hitBallisticObject = UseBallisticMaterials ? hitTrans.GetComponent<MaterialObject>() : null;
+                            hitBallisticObject = settings.UseBallisticMaterials ? hitTrans.GetComponent<MaterialObject>() : null;
 
 
                             if (hitBallisticObject == null)
@@ -218,7 +192,7 @@ namespace Ballistics
                                 //call BulletImpact on the hitBallisticObject
                                 hitBallisticObject.BulletImpact(hit);
 
-                                if (UseSpreadMaterials)
+                                if (settings.UseSpreadMaterials)
                                 {
                                     Vector3 dirNorm = dir.normalized;
                                     //does this bullet ricochet=
@@ -334,9 +308,9 @@ namespace Ballistics
                         //Update Transform
                         if (cBullet.BulletTrans != null)
                         {
-                            if (cBullet.StartLifeTime - cBullet.lifeTime < VisualBulletToRealBulletMovementTime)
+                            if (cBullet.StartLifeTime - cBullet.lifeTime < settings.VisualBulletToRealBulletMovementTime)
                             {
-                                cBullet.VisualOffset = Vector3.Lerp(cBullet.StartOffset, Vector3.zero, (cBullet.StartLifeTime - cBullet.lifeTime) / VisualBulletToRealBulletMovementTime);
+                                cBullet.VisualOffset = Vector3.Lerp(cBullet.StartOffset, Vector3.zero, (cBullet.StartLifeTime - cBullet.lifeTime) / settings.VisualBulletToRealBulletMovementTime);
                             }
                             else
                             {
@@ -351,7 +325,7 @@ namespace Ballistics
                 }
                 else
                 {
-                    bulletListTmp[i - MaxBulletUpdatesPerFrame].timeSinceLastUpdate += deltaTime; 
+                    bulletListTmp[i - settings.MaxBulletUpdatesPerFrame].timeSinceLastUpdate += deltaTime; 
                 }
             }
         }

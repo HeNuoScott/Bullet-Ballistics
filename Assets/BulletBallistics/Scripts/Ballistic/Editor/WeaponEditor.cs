@@ -37,8 +37,8 @@ namespace Ballistics
             TargetWeapon.LifeTimeOfBullets = EditorGUILayout.FloatField("子弹存留时间", TargetWeapon.LifeTimeOfBullets);
             TargetWeapon.MuzzleDamage = EditorGUILayout.FloatField("枪口伤害", TargetWeapon.MuzzleDamage);
             TargetWeapon.HitMask = LayerMaskField("碰撞层级", TargetWeapon.HitMask);
-            BulletHandler.IsDynamicEditor = EditorGUILayout.ToggleLeft("动态调节瞄准点", BulletHandler.IsDynamicEditor);
-            if (BulletHandler.IsDynamicEditor) TargetWeapon.AimDistOffset = EditorGUILayout.FloatField("误差距离", TargetWeapon.AimDistOffset);
+            BallisticsSettings.Instance.IsDynamicEditor = EditorGUILayout.ToggleLeft("动态调节瞄准点", BallisticsSettings.Instance.IsDynamicEditor);
+            if (BallisticsSettings.Instance.IsDynamicEditor) TargetWeapon.AimDistOffset = EditorGUILayout.FloatField("误差距离", TargetWeapon.AimDistOffset);
 
             EditorGUILayout.Space();
             EditorGUI.indentLevel--;
@@ -87,8 +87,6 @@ namespace Ballistics
             }
             EditorGUI.indentLevel -= 2;
             EditorGUILayout.Space();
-            // 动态保存
-            if (BulletHandler.IsDynamicEditor && GUI.changed) EditorUtility.SetDirty(TargetWeapon);
         }
 
         public static LayerMask LayerMaskField(string label, LayerMask selected)

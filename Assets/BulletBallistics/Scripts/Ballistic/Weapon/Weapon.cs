@@ -63,6 +63,7 @@ namespace Ballistics
 
         private BulletHandler bulletHandler;
         private BulletPoolManager myPool;
+        private BallisticsSettings settings;
 
         //储存预先就计算的阻力以节省性能
         public float PreDrag;
@@ -70,6 +71,7 @@ namespace Ballistics
 
         private void Start()
         {
+            settings = BallisticsSettings.Instance;
             myPool = BulletPoolManager.Instance;
             bulletHandler = BulletHandler.Instance;
             if (bulletHandler == null) return;
@@ -78,7 +80,7 @@ namespace Ballistics
 
         private void OnDrawGizmos()
         {
-            if (BulletHandler.IsDynamicEditor)
+            if (BallisticsSettings.Instance.IsDynamicEditor)
             {
                 Gizmos.color = Color.green;
                 Gizmos.DrawLine(AimStartPoint.position, AimStartPoint.position + AimStartPoint.forward * 1000f);
@@ -90,7 +92,7 @@ namespace Ballistics
         public void RecalculatePrecalculatedValues()
         {
             area = Mathf.Pow(Diameter / 2, 2) * Mathf.PI;
-            PreDrag = (0.5f * BulletHandler.AirDensity * area * DragCoefficient) / BulletMass;
+            PreDrag = (0.5f * settings.AirDensity * area * DragCoefficient) / BulletMass;
 
             if (BarrelZeroingDistances.Count > 0)
             {
@@ -111,9 +113,9 @@ namespace Ballistics
                 float FlightTime;
                 float drop;
 
-                if (BulletHandler.UseBulletdrag)
+                if (settings.UseBulletdrag)
                 {
-                    float k = (BulletHandler.AirDensity * DragCoefficient * Mathf.PI * (Diameter * 0.5f) * (Diameter * 0.5f)) / (2 * BulletMass);
+                    float k = (settings.AirDensity * DragCoefficient * Mathf.PI * (Diameter * 0.5f) * (Diameter * 0.5f)) / (2 * BulletMass);
                     FlightTime = (Mathf.Exp(k * FlightDistance) - 1) / (k * MaxBulletSpeed);
                 }
                 else
@@ -152,7 +154,7 @@ namespace Ballistics
                 }
                 bClone.gameObject.SetActive(true);
             }
-            if (BulletHandler.IsDynamicEditor) CalculateBarrelZeroCorrections();
+            if (settings.IsDynamicEditor) CalculateBarrelZeroCorrections();
             //calculte in zeroing corrections
             //Vector3 dir = (currentBarrelZero != -1 ? Quaternion.AngleAxis(BarrelZeroingCorrections[currentBarrelZero], AimStartPoint.right) * AimStartPoint.forward : AimStartPoint.forward);
             Vector3 dir = (currentBarrelZero != -1 ? Quaternion.AngleAxis(BarrelZeroingCorrections[currentBarrelZero], Vector3.right) * AimStartPoint.forward : AimStartPoint.forward);

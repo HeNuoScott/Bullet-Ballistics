@@ -8,7 +8,7 @@ namespace Ballistics
     {
         void ReAwake();
     }
-
+    [RequireComponent(typeof(BulletHandler))]
     public class BulletPoolManager : MonoBehaviour
     {
         public static BulletPoolManager Instance = null;

@@ -992,6 +992,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   StartHealth: 100
   basicWeaponHandle: {fileID: 575578749}
+  TargetWeaponController: {fileID: 0}
   WeaponCam: {fileID: 259641115}
   MoveSpeed: 40
   TurnSpeed: 1
@@ -1029,7 +1030,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91c03fccc8ccb524aa2c57e75d61a44e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentWeapon: {fileID: 1928734702}
+  CurrentWeapon: {fileID: 0}
 --- !u!1 &700759862
 GameObject:
   m_ObjectHideFlags: 0
@@ -7755,19 +7756,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   VisualSpawnPoint: {fileID: 1338814533}
-  PhysicalBulletSpawnPoint: {fileID: 244143516}
-  ScopePos: {fileID: 1966671024}
+  AimStartPoint: {fileID: 0}
+  AimEndPoint: {fileID: 0}
   LifeTimeOfBullets: 4
   HitMask:
     serializedVersion: 2
     m_Bits: 4294967263
   MuzzleDamage: 50
+  AimDistOffset: 5
   MaxBulletSpeed: 900
-  randomSpeedOffset: 10
   BulletMass: 0.02
   Diameter: 0.008
   DragCoefficient: 0.3
-  BulletPref: {fileID: 433382, guid: 69ca6c5805888df419446062d856b94d, type: 3}
+  BulletPrefab: {fileID: 0}
   BarrelZeroingDistances:
   - 500
   BarrelZeroingCorrections: []
@@ -7786,20 +7787,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetWeapon: {fileID: 1928734701}
-  sound: {fileID: 1338814536}
-  particle: {fileID: 1338814535}
-  AttackTime: 0.7
+  sound: {fileID: 0}
+  particle: {fileID: 0}
+  ScopePos: {fileID: 0}
+  AttackTime: 0
   HoldTime: 0
-  ReleaseTime: 0.25
+  ReleaseTime: 0
   ReloadTime: 0
-  RecoilAmount: 1
-  WeaponSpreadWalking: 1
+  RecoilAmount: 0
   ShootDelay: 0.1
   WeaponType: 2
   BulletsPerShot: 3
   BurstSpreadAngle: 5
   SalveBulletShootDelay: 0.04
-  myMagazineController: {fileID: 1928734699}
+  myMagazineController: {fileID: 0}
   isAiming: 0
 --- !u!1 &1966671023
 GameObject:

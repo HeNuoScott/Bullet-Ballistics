@@ -9,11 +9,14 @@ namespace Ballistics
     public class FalloffMapGeneratorEditor : Editor
     {
         private FalloffMapGenerator t;
+        private BallisticsSettings settings;
         private bool ShowZeroList = true;
         private bool isGizmosTexture = false;
+
         private void OnEnable()
         {
             t = (FalloffMapGenerator)target;
+            settings = BallisticsSettings.Instance;
         }
 
         public void OnSceneGUI()
@@ -80,7 +83,7 @@ namespace Ballistics
             {
                 if (GUILayout.Button("生成瞄准镜贴图"))
                 {
-                    GenerateFalloffTexture(BulletHandler.UseBulletdrag, BulletHandler.AirDensity);
+                    GenerateFalloffTexture(settings.UseBulletdrag, settings.AirDensity);
                 }
             }
 
