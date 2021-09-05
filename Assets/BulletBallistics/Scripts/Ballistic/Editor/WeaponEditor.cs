@@ -5,13 +5,14 @@ using UnityEditor;
 namespace Ballistics
 {
     [CustomEditor(typeof(Weapon))]
+    [CanEditMultipleObjects]
     public class WeaponEditor : Editor
     {
         Weapon TargetWeapon;
 
         private bool showBarrelZero;
 
-        void OnEnable()
+        private void OnEnable()
         {
             TargetWeapon = (Weapon)target;
         }
@@ -31,6 +32,7 @@ namespace Ballistics
                 }
                 TargetWeapon.AimStartPoint.LookAt(TargetWeapon.AimEndPoint);
             }
+
             TargetWeapon.VisualSpawnPoint = (Transform)EditorGUILayout.ObjectField("枪口特效位置", TargetWeapon.VisualSpawnPoint, typeof(Transform), true);
             TargetWeapon.AimStartPoint = (Transform)EditorGUILayout.ObjectField("瞄准点(起点)", TargetWeapon.AimStartPoint, typeof(Transform), true);
             TargetWeapon.AimEndPoint = (Transform)EditorGUILayout.ObjectField("瞄准点(终点)", TargetWeapon.AimEndPoint, typeof(Transform), true);
@@ -38,8 +40,10 @@ namespace Ballistics
             TargetWeapon.MuzzleDamage = EditorGUILayout.FloatField("枪口伤害", TargetWeapon.MuzzleDamage);
             TargetWeapon.HitMask = LayerMaskField("碰撞层级", TargetWeapon.HitMask);
             BallisticsSettings.Instance.IsDynamicEditor = EditorGUILayout.ToggleLeft("动态调节瞄准点", BallisticsSettings.Instance.IsDynamicEditor);
-            if (BallisticsSettings.Instance.IsDynamicEditor) TargetWeapon.AimDistOffset = EditorGUILayout.FloatField("误差距离", TargetWeapon.AimDistOffset);
-
+            if (BallisticsSettings.Instance.IsDynamicEditor)
+            {
+                TargetWeapon.AimDistOffset = EditorGUILayout.FloatField("误差距离", TargetWeapon.AimDistOffset);
+            }
             EditorGUILayout.Space();
             EditorGUI.indentLevel--;
             EditorGUILayout.LabelField("子弹设置", EditorStyles.boldLabel);
@@ -48,20 +52,19 @@ namespace Ballistics
             TargetWeapon.BulletPrefab = (Transform)EditorGUILayout.ObjectField("子弹预制体", TargetWeapon.BulletPrefab, typeof(Transform), true);
             TargetWeapon.MaxBulletSpeed = EditorGUILayout.FloatField("子弹初速度", TargetWeapon.MaxBulletSpeed);
             TargetWeapon.BulletMass = EditorGUILayout.FloatField("子弹质量", TargetWeapon.BulletMass);
-
             EditorGUI.indentLevel++;
             EditorGUILayout.LabelField("最大动能:\t " + (0.5f * TargetWeapon.BulletMass * TargetWeapon.MaxBulletSpeed * TargetWeapon.MaxBulletSpeed).ToString() + " J", EditorStyles.miniLabel);
             EditorGUI.indentLevel--;
 
             TargetWeapon.DragCoefficient = EditorGUILayout.FloatField("阻力系数", TargetWeapon.DragCoefficient);
             TargetWeapon.Diameter = EditorGUILayout.FloatField("子弹直径", TargetWeapon.Diameter);
-
             EditorGUILayout.Space();
 
             EditorGUI.indentLevel--;
             EditorGUILayout.LabelField("瞄准归零点", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
             TargetWeapon.currentBarrelZero = EditorGUILayout.IntField("当前选中的归零点", TargetWeapon.currentBarrelZero);
+
             EditorGUILayout.BeginHorizontal();
             showBarrelZero = EditorGUILayout.Foldout(showBarrelZero, "瞄准距离");
             if (GUILayout.Button("+"))
@@ -87,6 +90,8 @@ namespace Ballistics
             }
             EditorGUI.indentLevel -= 2;
             EditorGUILayout.Space();
+
+            if (GUI.changed) EditorUtility.SetDirty(TargetWeapon);
         }
 
         public static LayerMask LayerMaskField(string label, LayerMask selected)

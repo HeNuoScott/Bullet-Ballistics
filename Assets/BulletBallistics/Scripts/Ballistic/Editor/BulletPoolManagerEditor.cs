@@ -84,6 +84,8 @@ namespace Ballistics
                 }
                 EditorGUILayout.EndHorizontal();
             }
+
+            if (GUI.changed) EditorUtility.SetDirty(bulletPool);
         }
 
     }

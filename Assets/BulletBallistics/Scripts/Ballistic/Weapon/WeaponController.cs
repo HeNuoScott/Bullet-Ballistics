@@ -89,18 +89,25 @@ namespace Ballistics
         {
             if (myMagazineController.IsBulletAvailable() && CooldownTimer <= 0)
             {
+                Vector3 rotation = Vector3.zero;
                 switch (WeaponType)
                 {
                     case ShootingType.Auto://自动模式
-                        TargetWeapon.ShootBullet();
+                        TargetWeapon.ShootBullet(rotation);
                         CallOnShoot();
                         break;
                     case ShootingType.Burst://单次多发(散弹枪)
                         if (shootReset)
                         {
+                            int max = BulletsPerShot / 2;
+                            int min = -max;
+                            
                             for (int i = 0; i < BulletsPerShot; i++)
                             {
-                                TargetWeapon.ShootBullet();
+                                rotation.x = (rotation.x + UnityEngine.Random.Range(-BurstSpreadAngle, BurstSpreadAngle)) % 360;
+                                rotation.y = (rotation.y + UnityEngine.Random.Range(-BurstSpreadAngle, BurstSpreadAngle)) % 360;
+                                rotation = rotation * 0.01f;
+                                TargetWeapon.ShootBullet(rotation);
                             }
                             CallOnShoot();
                             shootReset = false;
@@ -110,7 +117,7 @@ namespace Ballistics
 
                         if (shootReset)
                         {
-                            TargetWeapon.ShootBullet();
+                            TargetWeapon.ShootBullet(rotation);
                             SalvesBulletCounter++;
                             CallOnShoot();
                             shootReset = false;
@@ -120,7 +127,7 @@ namespace Ballistics
                     case ShootingType.SingleShot://单发
                         if (shootReset)
                         {
-                            TargetWeapon.ShootBullet();
+                            TargetWeapon.ShootBullet(rotation);
                             CallOnShoot();
                             shootReset = false;
                         }
@@ -137,7 +144,7 @@ namespace Ballistics
             while (SalvesBulletCounter < BulletsPerShot)
             {
                 yield return new WaitForSeconds(SalveBulletShootDelay);
-                TargetWeapon.ShootBullet();
+                TargetWeapon.ShootBullet(Vector3.zero);
                 SalvesBulletCounter++;
                 CallOnShoot();
                 if (SalvesBulletCounter >= BulletsPerShot)

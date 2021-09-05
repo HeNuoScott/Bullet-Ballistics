@@ -70,6 +70,7 @@ namespace Ballistics
             EditorGUILayout.Space();
 
             TargetWeaponController.myMagazineController = (MagazineController)EditorGUILayout.ObjectField("弹夹控制器", TargetWeaponController.myMagazineController, typeof(MagazineController), true);
+            if (GUI.changed) EditorUtility.SetDirty(TargetWeaponController);
         }
     }
 }

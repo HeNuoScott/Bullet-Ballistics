@@ -91,6 +91,7 @@ namespace Ballistics
             if (GUI.changed)
             {
                 SceneView.RepaintAll();
+                if (GUI.changed) EditorUtility.SetDirty(t);
             }
         }
 

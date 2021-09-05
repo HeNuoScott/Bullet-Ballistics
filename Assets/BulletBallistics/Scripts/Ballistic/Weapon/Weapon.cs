@@ -86,6 +86,7 @@ namespace Ballistics
                 Gizmos.DrawLine(AimStartPoint.position, AimStartPoint.position + AimStartPoint.forward * 1000f);
             }
         }
+
         /// <summary>
         /// 计算基本不变的值
         /// </summary>
@@ -131,12 +132,10 @@ namespace Ballistics
                 BarrelZeroingCorrections.Add(result);
             }
         }
-
         /// <summary>
         /// 实例化子弹 并将子弹交给BulletHandler计算
         /// </summary>
-        /// <param name="ShootDirection">子弹发射的方向(通常你想要使用‘PhysicalBulletSpawnPoint’。 向前，这个方向)  </param>
-        public void ShootBullet()
+        public void ShootBullet(Vector3 burstOffset)
         {
             Transform bClone = null;
             if (BulletPrefab != null)
@@ -158,6 +157,7 @@ namespace Ballistics
             //calculte in zeroing corrections
             //Vector3 dir = (currentBarrelZero != -1 ? Quaternion.AngleAxis(BarrelZeroingCorrections[currentBarrelZero], AimStartPoint.right) * AimStartPoint.forward : AimStartPoint.forward);
             Vector3 dir = (currentBarrelZero != -1 ? Quaternion.AngleAxis(BarrelZeroingCorrections[currentBarrelZero], Vector3.right) * AimStartPoint.forward : AimStartPoint.forward);
+            dir += burstOffset;
             //bulletHandler.Bullets.Enqueue(new BulletData(this, VisualSpawnPoint.position, Vector3.zero, dir, LifeTimeOfBullets, MaxBulletSpeed, bClone));
             bulletHandler.Bullets.Enqueue(new BulletData(this, AimStartPoint.position, VisualSpawnPoint.position - AimStartPoint.position, dir, LifeTimeOfBullets, MaxBulletSpeed, bClone));
         }
